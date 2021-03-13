@@ -15,15 +15,10 @@
 var map = L.map('mapa', {
   center: [-40.5,-63.5],
   minZoom: 4,
-  zoom: 4,
-  zoomControl: false
+  zoom: 4
 });
 
 var defaultLayer = L.tileLayer.provider('Esri.WorldTopoMap').addTo(map);
-
-L.control.zoom({
-    position: 'bottomright'
-}).addTo(map);
 </script>
 </body>
 </html>
