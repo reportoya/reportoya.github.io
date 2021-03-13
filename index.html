@@ -4,7 +4,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="utf-8">
 <title>Reporto Ya</title>
+<link rel="stylesheet" href="estilos.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="leaflet-providers.js"></script>
 </head>
 <body>
+<div id="mapa"></div>
+<script>
+var map = L.map('mapa', {
+  center: [-40.5329411,-62],
+  minZoom: 4,
+  zoom: 4,
+  zoomControl: false
+});
+
+var defaultLayer = L.tileLayer.provider('Esri.WorldTopoMap').addTo(map);
+
+L.control.zoom({
+    position: 'bottomright'
+}).addTo(map);
+</script>
 </body>
 </html>
