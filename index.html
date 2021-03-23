@@ -7,10 +7,12 @@
 <link rel="stylesheet" href="estilos.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="leaflet-providers.js"></script>
+<script src="/js/leaflet-providers.js"></script>
+<script src="/js/feednami.js"></script>
 </head>
 <body>
 <div id="mapa"></div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <script>
 var map = L.map('mapa', {
   center: [-40.5,-63.5],
@@ -19,17 +21,29 @@ var map = L.map('mapa', {
 });
 
 var defaultLayer = L.tileLayer.provider('Esri.WorldTopoMap').addTo(map);
-</script>
-<script
-  src="https://code.jquery.com/jquery-3.6.0.min.js"
-  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-  crossorigin="anonymous"></script>
-<script>
-/*
-$.get('https://api.telegram.org/bot1607403148:AAFthbfSCgz3ZQ1swBKxbQ3Vqf3Y4KnCIN4/getUpdates',function(data){
-    console.log(data);
-},'json');
-*/
+
+var entradas = [];
+
+feednami.load("https://tg.i-c-a.su/rss/reportoya", function(res) {
+    for (i=0; i<res.feed.entries.length; i++) {
+        entradas.push(res.feed.entries[i]);
+    }
+
+    for (i=0; i<entradas.length; i++) {
+        coordenadas = obtenerCoordenadas(entradas[i]);
+
+        if (coordenadas != undefined) {
+          L.marker([coordenadas[0], coordenadas[1]]).addTo(map)
+        }
+
+    }
+});
+
+function obtenerCoordenadas(entrada) {
+  var coordenadas = entrada.description.match(/-\d+\.\d+/g);
+  return coordenadas;
+}
+
 </script>
 </body>
 </html>
