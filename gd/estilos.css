@@ -1,0 +1,59 @@
+body {
+  margin: 0;
+  background-color: #2B2D42;
+  font-family: 'Roboto', sans-serif;
+}
+
+#cy {
+  width: 100vw;
+  height: 100vh;
+}
+
+#botones {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  text-align: center;
+}
+
+button {
+  margin: 20px 10px;
+}
+
+textarea {
+  width: 98%;
+  resize: none;
+}
+
+textarea, #checkboxes {
+  margin: 10px 0;
+}
+
+#texto {
+  text-align: center;
+  padding: 15px 20px;
+}
+
+.aceptar {
+  width: 100%;
+  margin: 5px auto;
+  text-align: center;
+}
+
+.aceptar a {
+  text-decoration: none;
+  font-weight: 500;
+  color: #2B2D42;
+}
+
+.aceptar a:hover {
+  color: #EF233C;
+}
+
+label {
+  margin-left: 4px;
+}
+
+input {
+  vertical-align: top;
+}

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gramática Distributiva</title>
+<link rel="stylesheet" href="estilos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+<link rel="preconnect" href="https://fonts.gstatic.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="botones">
+  <a href="#texto" rel="modal:open"><button>Editar texto</button></a>
+  <a href="#flechas" rel="modal:open"><button>Editar flechas</button></a>
+</div>
+<div id="texto" class="modal">
+  <textarea rows="10"></textarea>
+  <div class="aceptar"><a href="#" rel="modal:close">Aceptar</a></div>
+</div>
+<div id="flechas" class="modal">
+  <div id="checkboxes"></div>
+  <div class="aceptar"><a href="#" rel="modal:close">Aceptar</a></div>
+</div>
+<div id="cy"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.18.2/cytoscape.min.js" integrity="sha512-CBGCXtszkG5rYlQSTNUzk54/731Kz28WPk2uT1GCPCqgfVRJ2v514vzzf16HuGX9WVtE7JLqRuAERNAzFZ9Hpw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+<script src="js/formacionUnidadesSemanticas.js"></script>
+<script src="js/cadenasBinariasAscendentes.js"></script>
+<script>
+$(document).ready(function() {
+  var texto = $("textarea").val();
+  var checkboxes = generarCheckboxes(texto);
+  $("#checkboxes").html(checkboxes);
+
+  var indices = [];
+
+  generarGrafo(texto, indices);
+});
+
+var indices = [];
+
+$("textarea").bind('input propertychange', function() {
+  var texto = $("textarea").val();
+  var checkboxes = generarCheckboxes(texto);
+  $("#checkboxes").html(checkboxes);
+
+  var indices = [];
+
+  generarGrafo(texto, indices);
+});
+
+$(document).on('click', "input[type=checkbox]" , function() {
+    var index = $(this).index()/3;
+
+    if (this.checked) {
+        indices.push(index);
+    } else {
+        for (i=0; i<indices.length; i++) {
+            if (indices[i] == index) {
+                indices.splice(i,1);
+            }
+        }
+    }
+
+    var texto = $("textarea").val();
+    generarGrafo(texto, indices);
+    
+});
+</script>
+<script>
+function generarCheckboxes(texto) {
+  var us = formacionUnidadesSemanticas(texto);
+  var cba = cadenasBinariasAscendentes(us);
+
+  var checkboxes = "";
+
+  for (i=0; i<cba.length; i++) {
+    checkboxes = checkboxes + "<input type='checkbox'><label>" + cba[i][0] + "<sub>" + cba[i][1] + "</sub> " + " &#8594; " + cba[i][2] + "<sub>" + cba[i][3] + "</sub></label><br>";
+  }
+
+  return checkboxes;
+}
+
+function generarGrafo(texto, indices) {
+  var us = formacionUnidadesSemanticas(texto);
+
+  var e = [];
+
+  for (i=0; i<us.length; i++) {
+    e.push({data: {id: us[i]}})
+  }
+
+  var cba = cadenasBinariasAscendentes(us);
+
+  for (i=0; i<indices.length; i++) {
+    e.push({data: {id: i, source: cba[indices[i]][0], target: cba[indices[i]][2]}});
+  }
+
+  var l;
+
+  if (indices.length == 0) {
+    l = {name: 'grid', rows: 2};
+  } else {
+    var l = {name: 'breadthfirst', directed: true}
+  }
+
+  if (indices.length == 0) {
+
+  }
+
+  var cy = cytoscape({
+
+    container: document.getElementById('cy'), // container to render in
+    zoomingEnabled: true,
+    elements: e,
+
+    style: [ // the stylesheet for the graph
+      {
+        selector: 'node',
+        style: {
+          'background-color': '#EDF2F4',
+          'color': '#ffd700',
+          'font-weight': 700,
+          'label': 'data(id)'
+        }
+      },
+
+      {
+        selector: 'edge',
+        style: {
+          'width': 3,
+          'line-color': '#EDF2F4',
+          'target-arrow-color': '#EDF2F4',
+          'target-arrow-shape': 'triangle',
+          'curve-style': 'bezier'
+        }
+      }
+    ],
+
+    layout: l
+
+  });
+}
+</script>
+<script>
+/*
+var cy = cytoscape({
+
+  container: document.getElementById('cy'), // container to render in
+  zoomingEnabled: false,
+  elements: [ // list of graph elements to start with
+    { // node a
+      data: { id: 'a' }
+    },
+    { // node b
+      data: { id: 'b' }
+    },
+    { // edge ab
+      data: { id: 'ab', source: 'a', target: 'b' }
+    }
+  ],
+
+  style: [ // the stylesheet for the graph
+    {
+      selector: 'node',
+      style: {
+        'background-color': '#EDF2F4',
+        'color': '#EDF2F4',
+        'label': 'data(id)'
+      }
+    },
+
+    {
+      selector: 'edge',
+      style: {
+        'width': 3,
+        'line-color': '#EDF2F4',
+        'target-arrow-color': '#EDF2F4',
+        'target-arrow-shape': 'triangle',
+        'curve-style': 'bezier'
+      }
+    }
+  ],
+
+  layout: {
+    name: 'grid',
+    rows: 1
+  }
+
+});
+*/
+</script>
+</body>
+</html>
